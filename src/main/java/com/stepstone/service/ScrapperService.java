@@ -24,6 +24,7 @@ public class ScrapperService {
     }
     public HashMap<String, Integer> getLinks(String domain) throws IOException, URISyntaxException{
         domainList.clear();
+        Assert.isTrue(urlValidator.isValid(domain), "Wrong domain name.");
         Document document = Jsoup.connect(domain).get();
         String domainHost = new URI(domain).getHost();
         Elements links = document.select("a[href]");
