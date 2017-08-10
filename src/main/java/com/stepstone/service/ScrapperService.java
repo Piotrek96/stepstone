@@ -1,5 +1,6 @@
 package com.stepstone.service;
 
+import com.stepstone.data.providers.HtmlDataProvider;
 import org.apache.commons.validator.routines.UrlValidator;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -15,19 +16,19 @@ import java.util.HashMap;
 @Service
 public class ScrapperService {
     private final UrlValidator urlValidator;
+    private final HtmlDataProvider dataProvider;
 
     private final HashMap<String, Integer> domainList;
 
-    public ScrapperService() {
+    public ScrapperService(HtmlDataProvider dataProvider) {
+        this.dataProvider = dataProvider;
         urlValidator = new UrlValidator();
         domainList = new HashMap<String, Integer>();
     }
     public HashMap<String, Integer> getLinks(String domain) throws IOException, URISyntaxException{
         domainList.clear();
-        Assert.isTrue(urlValidator.isValid(domain), "Wrong domain name.");
-        Document document = Jsoup.connect(domain).get();
+        Elements links = this.dataProvider.getData(domain);
         String domainHost = new URI(domain).getHost();
-        Elements links = document.select("a[href]");
         links.stream().map(link -> link.attr("href"))
                 .filter(urlValidator::isValid)
                 .map(this::getHost)
